@@ -12,3 +12,20 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+   id          Int       @default(autoincrement()) @id
+   name        String
+   email       String
+   password    String
+    
+   posts       Post[]
+}
+
+model Post {
+   id          Int       @default(autoincrement()) @id
+   text        String
+   authorId    Int
+
+   author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
