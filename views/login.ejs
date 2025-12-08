@@ -8,7 +8,9 @@
 </head>
 <body>
    <div>
+      <a href="/">
       <img class="logo" src="../assets/images/logo.webp" width="300" alt="">
+      </a>
    </div>
    <div>
       <h2 class="title_page">
@@ -19,17 +21,18 @@
       Email : 
    </div>
    <div>
-         <label for="email"><input type="text" placeholder="📧"></label>
+      <form method="POST" action="/check_credentials">
+         <label for="email"><input name="email" class="email" type="text" placeholder="📧"></label>
    </div>
    <div>
       Mot de passe :
    </div>
    <div>
-         <label for="password"><input type="password" placeholder="🔒"></label>
+         <label for="password"><input name="password" class="pwd" type="password" placeholder="🔒"></label>
    </div>
    <div>
-      <form action="/verify_code">
-      <button>
+      
+      <button type="submit">
          Connexion
          
       </button>

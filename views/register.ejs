@@ -8,7 +8,9 @@
 </head>
 <body>
     <div>
+      <a href="/">
       <img class="logo" src="../assets/images/logo.webp" width="300" alt="">
+      </a>
    </div>
    <div>
     <h2 class="title_page">
@@ -19,10 +21,10 @@
         Email
    </div>
    <div>
-         <label for="email"><input type="email" placeholder="📧"></label>
+      <form action="/check_register" method="post">
+         <label for="email"><input name="email" class="email" type="email" placeholder="📧"></label>
    </div>
    <div>
-      <form action="/register_verify">
       <button>
          Continuer
       </button>

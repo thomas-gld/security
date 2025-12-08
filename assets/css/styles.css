@@ -16,15 +16,34 @@ body {
 
 label {
     display: flex;
-    border-color: blue;
-    padding-bottom: 10px;
+}
+
+input {
+    display: flex;
+    border-color: royalblue;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    font-size: large;
 }
 
 button {
     display: flex;
-    padding-top: 10px;
+    padding-left: 60px;
+    padding-right: 60px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    border-radius: 15px;
     background-color: rgb(91, 91, 255);
     color: white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size:large;
+    margin-bottom: 30px;
+    font-weight: bold;
+}
+
+button:hover {
+    transform: translateY(-2px);
 }
 
 a {
@@ -34,7 +53,7 @@ a {
 
 img {
     display: flex;
-    padding-top: 30px;
+    padding-top: 20px;
 }
 
 div {
@@ -46,5 +65,6 @@ div {
     display: flex;
     color:rgb(0, 0, 0);
     text-align: center;
+    margin-bottom: 50px;
     
 }
