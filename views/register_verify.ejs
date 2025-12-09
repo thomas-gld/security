@@ -21,8 +21,9 @@
         Code de confirmation
     </div>
     <div>
-        <form action="">
-        <label for="code"><input type="text" placeholder="ex 12345"></label>
+        <form action="/register_verify_code" method="post">
+        <label for="code"><input name="code" type="text" placeholder="ex 12345"></label>
+        <label for="email"><input name="email" type="email" value="<%=email%>" style="visibility: hidden;"></label>
     </div>
     <div>
         <button>

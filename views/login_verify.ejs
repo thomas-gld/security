@@ -17,12 +17,14 @@
         Verifiez votre boite mail et tapez le code de confirmation
       </h2>
     </div>
+    
     <div>
         code de confirmation
     </div>
     <div>
-        <form action="">
+        <form action="/login_verify_code" method="post">
         <label for="code"><input name="code" type="text" placeholder="ex : 12345"></label>
+        <label for="email"><input name="email" type="email" value="<%=email%>" style="visibility: hidden;"></label>
     </div>
     <div>
             <button>
