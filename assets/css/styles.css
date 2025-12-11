@@ -1,10 +1,11 @@
 h1 {
-    color: brown;
+    color: rgb(255, 255, 255);
     text-align: center;
 }
 
 h3 {
-    color: grey;
+    color: gold;
+    margin-bottom: 15px;
 }
 
 
@@ -13,7 +14,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: rgb(248, 243, 236);
+    background-color: rgb(0, 18, 37);
 }
 
 label {
@@ -22,7 +23,7 @@ label {
 
 input {
     display: flex;
-    border-color: royalblue;
+    border-color: gold;
     padding: 15px;
     margin-bottom: 20px;
     border-radius: 15px;
@@ -36,7 +37,7 @@ button {
     padding-top: 15px;
     padding-bottom: 15px;
     border-radius: 15px;
-    background-color: rgb(91, 91, 255);
+    background-color: goldenrod;
     color: white;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size:large;
@@ -51,10 +52,13 @@ button:hover {
 a {
     display: flex;
     padding-top: 10px;
+    color: rgb(184, 139, 27);
+    font-style: italic;
 }
 
 p {
     display: flex;
+    color: goldenrod;
 }
 
 img {
@@ -65,16 +69,19 @@ img {
 div {
     display: flex;
     align-items: center;
+    color: goldenrod;
+    margin-bottom: 3px;
 }
 
 .title_page {
     display: flex;
-    color:rgb(0, 0, 0);
+    color: goldenrod;
     text-align: center;
-    margin-bottom: 50px;
+    margin-bottom: 30px;
     
 }
 
 .error {
     color: red;
 }
+

@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/login_verify', (req, res) => {
-   res.render('login_verify', {error_message : "", attempts : 0})
+   res.render('login_verify', {error_message : "", attempts : 0, email : ""})
 })
 
 app.get('/register', (req, res) => {
@@ -40,11 +40,11 @@ app.get('/forgotten_password', (req, res) => {
 })
 
 app.get('/forgotten_password_verify', (req, res) => {
-   res.render('forgotten_password_verify', {error_message : ""})
+   res.render('forgotten_password_verify', {error_message : "", email : "", attempts : ""})
 })
 
 app.get('/register_verify', (req, res) => {
-   res.render('register_verify', {error_message : ""})
+   res.render('register_verify', {error_message : "", email : "", attempts : ""})
 })
 
 app.get('/set_name_password', (req, res) => {
@@ -371,29 +371,6 @@ app.post('/update_password', async(req, res) => {
       res.render('set_new_password', {error_message : "Les mots de passe ne correspondent pas", email})
    }
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 const PORT = process.env.PORT || 3000

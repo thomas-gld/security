@@ -19,13 +19,12 @@
     </div>
     
     <div>
-        code de confirmation
+        Code de confirmation
     </div>
     <div>
         <form action="/login_verify_code" method="post">
         <label for="code"><input name="code" type="text" placeholder="ex : 12345"></label>
-        <label for="email"><input name="email" type="email" value="<%=email%>" style="visibility: hidden;"></label>
-        <label for="attempts"><input name="attempts" type="text" value="<%=attempts%>" style="visibility: hidden;"></label>
+        
     </div>
     <div>
     <p class="error">
@@ -40,6 +39,8 @@
             
         
     </div>
+    <label for="email"><input name="email" type="email" value="<%=email%>" style="visibility: hidden;"></label>
+        <label for="attempts"><input name="attempts" type="text" value="<%=attempts%>" style="visibility: hidden;"></label>
 
     </button>
     </form>
