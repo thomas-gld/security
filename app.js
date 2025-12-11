@@ -19,7 +19,6 @@ app.set('view engine', 'ejs')
 const db = await prisma.User.findMany()
 console.log(db)
 const email2code = {}
-
 const saltRounds = 5
 
 //-------------------------------------------------------
@@ -29,7 +28,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/login_verify', (req, res) => {
-   res.render('login_verify', {error_message : ""})
+   res.render('login_verify', {error_message : "", attempts : 0})
 })
 
 app.get('/register', (req, res) => {
@@ -69,6 +68,7 @@ app.get('/accueil', (req, res) => {
 app.post('/check_credentials', async (req, res) => {
    const email = req.body.email.toLowerCase();
    const password = req.body.password;
+   let attempts = 0
    // Users with this email in db
    const userList = await prisma.User.findMany({
       where : { email }
@@ -105,7 +105,8 @@ app.post('/check_credentials', async (req, res) => {
             // --SUCCES-- Send to 'login_verify.ejs'
             res.render('login_verify', {
                email,
-               error_message : ""
+               error_message : "",
+               attempts
             });
          }
       }
@@ -113,11 +114,12 @@ app.post('/check_credentials', async (req, res) => {
 });
 
 
-// 2. 'login_verify.ejs' --> email, code ==> post '/login_verify_code'
+// 2. 'login_verify.ejs' --> email, code, attempts ==> post '/login_verify_code'
 
 app.post('/login_verify_code', async(req, res) => {
    const email = req.body.email
    const code = req.body.code
+   let attempts = Number(req.body.attempts)
    
    // Input code corresponding with {emailUser : correspondingCode}
    if (email2code[email] === Number(code)) {
@@ -135,9 +137,18 @@ app.post('/login_verify_code', async(req, res) => {
    }
    // Input code NOT corresponding with {emailUser : correspondingCode}
    else {
+         // Increment number of failed attempts
+         attempts ++
+         // 3 failed attempts
+         if (attempts === 3) {
+            // Send back to 'login'
+            res.render('login', {error_message : "3 tentatives incorrectes"})
+         }
+         else {
          res.render('login_verify', {email,
-         error_message : "Code incorrect"
-      });
+         error_message : "Code incorrect",
+         attempts
+      })};
    }
 })
 
@@ -149,6 +160,7 @@ app.post('/login_verify_code', async(req, res) => {
 
 app.post('/check_register', async(req, res) => {
    const email = req.body.email.toLowerCase()
+   let attempts = 0
    // Users with this email in db
    const userList = await prisma.User.findMany({
       where : {
@@ -177,16 +189,19 @@ app.post('/check_register', async(req, res) => {
       res.cookie('code_wait', 'cookie code', {maxAge : 60000});
       // --SUCCES-- Send to ('register-verify')
       res.render('register_verify', {email,
-         error_message : ""})
+         error_message : "",
+         attempts   
+      })
    }
 })
 
-// 2. 'register_verify.ejs' --> email, code ==> post '/register_verify_code'
+// 2. 'register_verify.ejs' --> email, code, attempts ==> post '/register_verify_code'
 
 app.post('/register_verify_code', async(req, res) => {
    const email = req.body.email
    const code = req.body.code
-
+   let attempts = Number(req.body.attempts)
+   
    // Input code corresponding with {emailUser : correspondingCode}
    if (email2code[email] === Number(code)) {
       // Cookie code duration ok
@@ -203,10 +218,20 @@ app.post('/register_verify_code', async(req, res) => {
    }
    // Input code NOT corresponding with {emailUser : correspondingCode}
    else {
+      // increment number of failed attemtps
+      attempts ++
+      if (attempts === 3) {
+         // Send back to 'register"
+         res.render('register', {
+            error_message : "3 tentatives incorrectes"
+         })
+      }
+      else {
       // Resend to 'register_verify'
       res.render('register_verify', {email,
-         error_message : "Code incorrect"
-      });
+         error_message : "Code incorrect",
+         attempts
+      })};
    }   
 })
 
@@ -237,7 +262,7 @@ app.post('/register_new_user', async(req, res) => {
       // Give cookie with userName duration 1 day
       res.cookie('user_name', userName, {maxAge : 1000*60*60*24})
       // --SUCCES-- Send to 'home'
-      res.render('accueil', {user_name : req.cookies['user_name']})
+      res.render('login', {error_message : "Compte créé"})
    }
 })
 
@@ -249,6 +274,7 @@ app.post('/register_new_user', async(req, res) => {
 
 app.post('/check_mail_forgotten_password', async(req, res) => {
    const email = req.body.email;
+   let attempts = 0
    // Users in db with input email
    const userList = await prisma.User.findMany({
       where : {
@@ -275,15 +301,16 @@ app.post('/check_mail_forgotten_password', async(req, res) => {
       // Give cookie for code duration 1 min
       res.cookie('code_wait', 'lala', {maxAge : 60000});
       // --SUCCES-- Send to 'forgotten_password_verify'
-      res.render('forgotten_password_verify', {error_message : "", email})
+      res.render('forgotten_password_verify', {error_message : "", email, attempts})
    }
 }) 
 
-// 2. 'forgotten_password_verify.ejs' --> email, code ==> post '/forgotten_password_verify_code'
+// 2. 'forgotten_password_verify.ejs' --> email, code, attempts ==> post '/forgotten_password_verify_code'
 
 app.post('/forgotten_password_verify_code', async(req, res) => {
    const email = req.body.email
    const code = req.body.code
+   let attempts = Number(req.body.attempts)
    
    // Input code corresponding with {emailUser : correspondingCode}
    if (email2code[email] === Number(code)) {
@@ -301,10 +328,17 @@ app.post('/forgotten_password_verify_code', async(req, res) => {
    }
    // Input code incorrect
    else {
+      // Increment number of failed attempts
+      attempts ++
+      if (attempts === 3) {
+         // Send back to 'register'
+         res.render('register', {error_message : "3 tentatives incorrectes"})
+      }
+      else {
       // Resend to 'forgotten-password'
       res.render('forgotten_password_verify', {email,
-         error_message : "Code incorrect"
-      });
+         error_message : "Code incorrect", attempts
+      })};
    }
 })
 
