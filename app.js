@@ -4,10 +4,31 @@ import { sendMail } from './mail.mjs'
 import { generateCode } from './generate_code.mjs'
 import bcrypt from 'bcryptjs'
 import cookieParser from 'cookie-parser'
+import jwt from 'jsonwebtoken'
+import 'dotenv/config'
 
 //-------------------------------------------------------
 
 const app = express()
+const logger = (req, res, next) => {
+   if (req?.cookies?.['session-token']) {
+      const token = req.cookies['session-token'];
+      try {
+         const payload = jwt.verify(token, process.env.SECRET)
+         req.user = payload.name
+         next() 
+      } catch(err) {
+         res.render('login', {error_message : "Session invalide"})   
+      }
+   }
+   else {
+      res.render('login', {error_message : "Session invalide"}) 
+   }
+}
+const email2code = {}
+const saltRounds = 5
+
+// ---------------------------------------------------------
 
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
@@ -18,8 +39,6 @@ app.set('view engine', 'ejs')
 
 const db = await prisma.User.findMany()
 console.log(db)
-const email2code = {}
-const saltRounds = 5
 
 //-------------------------------------------------------
 
@@ -55,15 +74,12 @@ app.get('/set_new_password', (req, res) => {
    res.render('set_new_password', {error_message : "", email : ""})
 })
 
-app.get('/accueil', (req, res) => {
-   res.render('accueil', {user_name : req.cookies['user_name']})
-})
 
-// --------------------------------------------------------------------
-// ------ LOGIN PATH --------------------------------------------------
-// --------------------------------------------------------------------
-
-// 1. 'login.ejs' --> email, password ==> post '/check_credentials'
+// --------------------------------------------------------------------------------------------------------------
+// ------ LOGIN PATH ------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------
+                                                                                                                     
+// 1. 'login.ejs' --> email, password ==> post '/check_credentials'                                            
 
 app.post('/check_credentials', async (req, res) => {
    const email = req.body.email.toLowerCase();
@@ -90,18 +106,17 @@ app.post('/check_credentials', async (req, res) => {
          if (userList.length > 0 && passCheck === true) {
             // Send email with verification code
             const code = generateCode();
-            await sendMail({
-               from : 'buisson@enseeiht.fr',
-               to : email,
-               subject : 'Verification',
-               text : `Votre code de connexion est : ${code}`
-            });
+         //   await sendMail({
+         //      from : 'buisson@enseeiht.fr',
+         //      to : email,
+         //      subject : 'Verification',
+         //      text : `Votre code de connexion est : ${code}`
+         //   });
+            console.log(code)
             // Save {emailUser : correspondingCode}
             email2code[email] = code;
             // Give cookie for code duration 1 min
             res.cookie('code_wait', 'cookie code', { maxAge: 60000 });
-            // Give cookie with user's name
-            res.cookie('user_name', userList[0].name, { maxAge: 24*60*60000 });
             // --SUCCES-- Send to 'login_verify.ejs'
             res.render('login_verify', {
                email,
@@ -125,8 +140,15 @@ app.post('/login_verify_code', async(req, res) => {
    if (email2code[email] === Number(code)) {
       // Cookie code duration ok
       if ('code_wait' in req.cookies) {
-         // Send to 'home'
-         res.render('accueil', {user_name : req.cookies['user_name']})}
+         const user = await prisma.User.findUnique({
+            where : { email }
+         });
+         // Creation of token for user's session
+         const token = jwt.sign({"sub" : user.id, "name" : user.name}, process.env.SECRET)
+         // Give cookie with token
+         res.cookie("session-token", token, {maxAge : 3600 * 1000})
+         // Send to 'visit_list'
+         res.render('visit_list', {user_name : req.cookies['user_name']})}
       // Cookie code duration dead   
       else {
          // Send back to 'login.ejs'
@@ -178,11 +200,12 @@ app.post('/check_register', async(req, res) => {
    else {
       // Send email with verification code
       const code = generateCode()
-      await sendMail({from : 'buisson@enseeiht.fr',
-         to : email,
-         subject : 'Verification',
-         text : `Votre code de création de compte est : ${code}`
-      }) 
+      //await sendMail({from : 'buisson@enseeiht.fr',
+      //   to : email,
+      //   subject : 'Verification',
+      //   text : `Votre code de création de compte est : ${code}`
+      //})
+      console.log(code); 
       // Save {emailUser : correspondingCode}
       email2code[email] = code
       // Give cookie for code duration 1 min
@@ -259,9 +282,7 @@ app.post('/register_new_user', async(req, res) => {
             name: userName
          }
   });
-      // Give cookie with userName duration 1 day
-      res.cookie('user_name', userName, {maxAge : 1000*60*60*24})
-      // --SUCCES-- Send to 'home'
+      // --SUCCES-- Send to 'visit_list'
       res.render('login', {error_message : "Compte créé"})
    }
 })
@@ -291,12 +312,13 @@ app.post('/check_mail_forgotten_password', async(req, res) => {
    else {
       // Send email with verification code
       const code = generateCode()
-      await sendMail({from : 'buisson@enseeiht.fr',
-         to : email,
-         subject : 'Verification',
-         text : `Votre code de connexion est : ${code}`
-      }) 
-      // Save {emailUser : correspondingCode}
+      //await sendMail({from : 'buisson@enseeiht.fr',
+      //   to : email,
+      //   subject : 'Verification',
+      //   text : `Votre code de connexion est : ${code}`
+      //})
+      console.log(code) 
+      // Save {emailUser : correspondingCode} in email2code
       email2code[email] = code;
       // Give cookie for code duration 1 min
       res.cookie('code_wait', 'lala', {maxAge : 60000});
@@ -373,7 +395,16 @@ app.post('/update_password', async(req, res) => {
 })
 
 
+app.use(logger)
+
+
+app.get('/visit_list', (req, res) => {
+   res.render('visit_list', {user_name : req.cookies['user_name']})
+})
+
+
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
    console.log(`Server listening on port http://localhost:${PORT}`)
 })
+
