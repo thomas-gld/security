@@ -1,4 +1,11 @@
 {
+  "type": "module",
+
+  "scripts": {
+    "hello" : "echo hello",
+    "dev" : "npx nodemon app.js"
+  },
+
   "dependencies": {
     "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "^7.1.0",
@@ -7,10 +14,10 @@
     "dotenv": "^17.2.3",
     "ejs": "^3.1.10",
     "express": "^5.2.1",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^7.0.11",
     "pg": "^8.16.3",
     "prisma": "^7.1.0"
-  },
-  "type": "module"
+  }
 }

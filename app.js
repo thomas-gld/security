@@ -5,6 +5,7 @@ import { generateCode } from './generate_code.mjs'
 import bcrypt from 'bcryptjs'
 import cookieParser from 'cookie-parser'
 import jwt from 'jsonwebtoken'
+import helmet from 'helmet'
 import 'dotenv/config'
 
 //-------------------------------------------------------
@@ -32,7 +33,8 @@ const saltRounds = 5
 
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-app.use('/assets', express.static('./assets'))
+app.use('/assets', express.static('./assets'));
+app.use(helmet());
 
 app.set('view engine', 'ejs')
 
@@ -148,7 +150,7 @@ app.post('/login_verify_code', async(req, res) => {
          // Give cookie with token
          res.cookie("session-token", token, {maxAge : 3600 * 1000})
          // Send to 'visit_list'
-         res.render('visit_list', {user_name : req.cookies['user_name']})}
+         res.render('visit_list', {user_name : user.name})}
       // Cookie code duration dead   
       else {
          // Send back to 'login.ejs'
@@ -264,6 +266,8 @@ app.post('/register_new_user', async(req, res) => {
    const email = req.body.email
    const userName = req.body.name
    const password = req.body.password
+   const role = req.body.role
+   console.log(role)
    const passwordConfirm = req.body.password_confirm
    
    // Input password and passwordConfirm are differents
@@ -277,9 +281,10 @@ app.post('/register_new_user', async(req, res) => {
       // Add new user in db
       await prisma.User.create({
          data: {
-            email: req.body.email,
+            email: email,
             password: passHashed,
-            name: userName
+            name: userName,
+            role : role
          }
   });
       // --SUCCES-- Send to 'visit_list'
@@ -395,15 +400,19 @@ app.post('/update_password', async(req, res) => {
 })
 
 
+app.get('/visit_list', (req, res) => {
+   const token = req.cookies['session-token'];
+   const payload = jwt.verify(token, process.env.SECRET)
+   const user_name = payload.name
+   console.log(payload, user_name)
+   res.render('visit_list', {user_name})
+})
+
 app.use(logger)
 
 
-app.get('/visit_list', (req, res) => {
-   res.render('visit_list', {user_name : req.cookies['user_name']})
-})
 
-
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT 
 app.listen(PORT, () => {
    console.log(`Server listening on port http://localhost:${PORT}`)
 })

@@ -18,14 +18,35 @@ model User {
    name        String
    email       String    @unique
    password    String
+   role        String
+
+   visites Visite[]
     
-   posts       Post[]
 }
 
-model Post {
-   id          Int       @default(autoincrement()) @id
-   text        String
-   authorId    Int
 
-   author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+model Company {
+   id          Int        @default(autoincrement()) @id
+   name        String 
+   address     String
+   
+   visites     Visite[]
+
+}
+
+model Visite {
+  id            Int         @default(autoincrement()) @id
+  date          DateTime
+  report        String
+
+  company       Company     @relation(fields: [companyId], references: [id])  
+  companyId     Int
+
+  inspector     User        @relation(fields: [inspectorId], references: [id])  
+  inspectorId   Int
+
+
+      
+
+
 }

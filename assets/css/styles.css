@@ -82,9 +82,25 @@ div {
 }
 
 .header {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
     width: 100%;
+    align-items: center;
+}
+
+.header-left {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.header-center {
+    display: flex;
+    justify-content: center;
+}
+
+.header-right {
+    display: flex;
+    justify-content: flex-end;
 }    
 
 
@@ -101,3 +117,34 @@ h1:hover {
     cursor: pointer;
 }
 
+table {
+    display: flex;
+    flex-direction: row;
+    font-size: x-large;
+}
+
+th {
+    padding-left: 60px;
+    font-weight: bolder;
+    padding-bottom: 30px;
+}
+
+
+select {
+    display: flex;
+    border-color: gold;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    font-size: large;
+    text-align: center;
+}
+
+select:hover {
+    cursor: pointer;
+}
+
+.add_company {
+    margin-left: 15px;
+    margin-top: 13px;
+}
